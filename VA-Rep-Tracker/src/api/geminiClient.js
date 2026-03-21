@@ -49,7 +49,7 @@ export async function generateContent(prompt) {
       ],
       generationConfig: {
         thinkingConfig: {
-          thinkingBudget: 1024
+          thinkingBudget: 1024 //token limit
         }
       }
     }

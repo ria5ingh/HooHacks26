@@ -1,8 +1,8 @@
-// App.jsx
-import { generateContent } from "./api/geminiClient";
+import { getAllBills } from "./api/bills";
 
-// test of geminiClient using generateContent() function
-generateContent("How does AI work?").then(console.log);
+//testing getting all bill for current congress and printing it 
+const billsArray = getAllBills()
+console.log(billsArray)
 
 export default function App() {
   return <div>VA Rep Dashboard</div>
