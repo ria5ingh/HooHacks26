@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { getCosponLegislation } from "./api/votes";
-import { getSponLegislation } from "./api/votes";
+import { getSponLegislation, extractNumberTypeMap } from "./api/votes";
 
+/** 
 export default function App() {
   useEffect(() => {
     getSponLegislation("L000174")
@@ -11,6 +11,17 @@ export default function App() {
     getCosponLegislation("L000174")
       .then((arr) => console.log("cosponsored:", arr))
       .catch((err) => console.error("cosponsored error:", err));
+  }, []);
+
+  return <div>VA Rep Dashboard</div>;
+}
+**/
+
+export default function App() {
+  useEffect(() => {
+    getSponLegislation("L000174")
+      .then((arr) => console.log(extractNumberTypeMap(arr)))
+      .catch(console.error);
   }, []);
 
   return <div>VA Rep Dashboard</div>;

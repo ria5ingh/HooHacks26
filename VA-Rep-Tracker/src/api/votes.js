@@ -49,3 +49,16 @@ export async function getCosponLegislation(ID){
     console.log('[debug] getCosponLegislation sample=', valid.slice(0, 3));
     return valid.slice(0, 10);
 }
+
+/**
+ * HELPER FUNCTION: Create a dictionary mapping bill number -> bill type from
+ * the array returned by `getSponsoredLegislation` (or similar).
+ * Returns an empty object for invalid input.
+ */
+export function extractNumberTypeMap(items) {
+    if (!Array.isArray(items)) return {};
+    return items.reduce((map, bill) => {
+            map[bill.number] = bill.type;
+        return map;
+    }, {});
+}

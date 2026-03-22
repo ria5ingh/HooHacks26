@@ -1,4 +1,5 @@
 import congressClient from "./congressClient";
+import { getSponLegislation } from "./votes";
 
 /**
  * 
@@ -6,7 +7,14 @@ import congressClient from "./congressClient";
  */
 export async function getAllBills(){
     const { data } = await congressClient.get("/bill", {
-        params: { congress: 118 }
+        params: { congress: 119 }
     });
-    return data.bills;
+    return data;
+}
+
+export async function getBillSummaries(billNumber, billType){
+    const { data } = await congressClient.get("/bill/" + billType + "/" + billNumber + "/summaries", {
+        params: { limit : 10}
+    });
+    return data;
 }
