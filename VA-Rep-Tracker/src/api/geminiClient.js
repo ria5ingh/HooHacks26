@@ -8,11 +8,11 @@ const geminiClient = axios.create({
   }
 });
 
-geminiClient.interceptors.request.use(config => {
+geminiClient.interceptors.request.use(requestConfig => {
   if (import.meta.env.DEV) {
-    console.log(`[Gemini] → ${config.method.toUpperCase()} ${config.url}`);
+    console.log(`[Gemini] → ${requestConfig.method.toUpperCase()} ${requestConfig.url}`);
   }
-  return config;
+  return requestConfig;
 });
 
 geminiClient.interceptors.response.use(
@@ -56,11 +56,11 @@ export async function generateContent(prompt) {
   );
 
   const parts = data.candidates[0].content.parts;
-  const thinkingParts = parts.filter(p => p.thought === true);
-  const responseParts = parts.filter(p => p.thought !== true);
+  const thinkingParts = parts.filter(part => part.thought === true);
+  const responseParts = parts.filter(part => part.thought !== true);
 
-  const thinking = thinkingParts.map(p => p.text).join("\n");
-  const text = responseParts.map(p => p.text).join("\n");
+  const thinking = thinkingParts.map(part => part.text).join("\n");
+  const text = responseParts.map(part => part.text).join("\n");
 
   return { text, thinking };
 }
@@ -74,9 +74,9 @@ export async function generateContent(prompt) {
  *   breakdown: array of { promiseTopic, promiseText, correlatingBills: [{number,type,title}], reasoning }
  */
 export async function analyzePromisesFulfillment(rep, billTitles) {
-  const promiseTexts = rep.promises.map((p, i) => `${i + 1}. ${p.topic}: ${p.text}`).join("\n");
+  const promiseTexts = rep.promises.map((promise, index) => `${index + 1}. ${promise.topic}: ${promise.text}`).join("\n");
   const billTexts = billTitles
-    .map(b => `${b.number} (${b.type}): ${b.title}`)
+    .map(bill => `${bill.number} (${bill.type}): ${bill.title}`)
     .join("\n");
 
   const prompt = `
@@ -119,14 +119,14 @@ For each campaign promise, list the bill numbers (from the Sponsored Bills list)
     // Attach full bill objects to each breakdown item for the UI
     const breakdown = (parsed.breakdown || []).map(item => ({
       ...item,
-      correlatingBills: (item.correlatingBills || []).map(num =>
-        billTitles.find(b => String(b.number) === String(num)) || { number: num, type: "", title: num }
+      correlatingBills: (item.correlatingBills || []).map(billNumber =>
+        billTitles.find(bill => String(bill.number) === String(billNumber)) || { number: billNumber, type: "", title: billNumber }
       )
     }));
 
     return { score, breakdown, thinking };
-  } catch (e) {
-    console.error("[Gemini] Failed to parse JSON response", e);
+  } catch (error) {
+    console.error("[Gemini] Failed to parse JSON response", error);
     const score = parseInt(text.trim(), 10);
     return { score: isNaN(score) ? 50 : Math.max(0, Math.min(100, score)), breakdown: [], thinking };
   }

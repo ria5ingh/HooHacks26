@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ziptodist from "../data/ziptodist.json";
-import reps from "../data/reps.json";
+import ziptodist from "../../data/ziptodist.json";
+import reps from "../../data/reps.json";
 
 export default function SearchPage() {
   const [selectedCounty, setSelectedCounty] = useState("");

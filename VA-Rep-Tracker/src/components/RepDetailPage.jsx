@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getSponLegislation, extractBillTitles } from "./api/votes";
-import { analyzePromisesFulfillment } from "./api/geminiClient";
+import { getSponLegislation, extractBillTitles } from "../api/votes";
+import { analyzePromisesFulfillment } from "../api/geminiClient";
 
 const PROMISE_COLORS = [
   "#e74c3c", "#3498db", "#2ecc71", "#f39c12",
@@ -80,7 +80,7 @@ export default function RepDetailPage() {
 
       <section className="analysis">
         <h2>Promise Fulfillment Analysis</h2>
-        {loading && <p className="loading-text">Analyzing sponsored bills with AI…</p>}
+        {loading && <p className="loading-text">Analyzing</p>}
         {error && <p className="error">{error}</p>}
 
         {fulfillmentScore !== null && (

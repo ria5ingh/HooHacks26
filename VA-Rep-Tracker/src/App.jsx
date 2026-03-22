@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-import SearchPage from "./SearchPage";
-import RepDetailPage from "./RepDetailPage";
+import SearchPage from "./components/SearchPage";
+import RepDetailPage from "./components/RepDetailPage";
 
 export default function App() {
   return (
