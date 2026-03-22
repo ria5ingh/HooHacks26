@@ -11,10 +11,3 @@ export async function getAllBills(){
     });
     return data;
 }
-
-export async function getBillSummaries(billNumber, billType){
-    const { data } = await congressClient.get("/bill/" + billType + "/" + billNumber + "/summaries", {
-        params: { limit : 10}
-    });
-    return data;
-}
