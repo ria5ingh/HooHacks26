@@ -93,7 +93,6 @@ export default function App() {
       .catch((err) => console.error("cosponsored error:", err));
   }, []);
 
-  return <div>VA Rep Dashboard</div>;
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
