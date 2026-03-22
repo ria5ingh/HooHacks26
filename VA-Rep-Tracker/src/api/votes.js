@@ -45,9 +45,10 @@ export async function getCosponLegislation(ID){
     console.log('[debug] getCosponLegislation id=', ID, 'response keys=', Object.keys(data));
     console.log('[debug] getCosponLegislation raw array length=', arr.length);
     const valid = filterValid(arr);
+    valid = valid.slice(0, 10);
     console.log('[debug] getCosponLegislation filtered length=', valid.length);
     console.log('[debug] getCosponLegislation sample=', valid.slice(0, 3));
-    return valid.slice(0, 10);
+    return valid;
 }
 
 /**
@@ -64,6 +65,17 @@ export function extractNumberTypeMap(items) {
 }
 
 /**
+ * HELPER FUNCTION: Extract bill titles from the sponsored legislation array.
+ * Returns a list of {number, title, type} objects.
+ */
+export function extractBillTitles(items) {
+    if (!Array.isArray(items)) return [];
+    return items
+        .filter(bill => bill && bill.number != null && bill.title != null)
+        .map(bill => ({ number: bill.number, title: bill.title, type: bill.type }));
+}
+
+/**
  * Given a map of billNumber -> billType, fetch one summary per bill
  * from `/bill/{congress}/{billnumber}/{billtype}/summaries` and
  * return an array of result objects: { number, type, congress, summary }
@@ -77,9 +89,11 @@ export async function fetchSummariesFromMap(map) {;
             try {
                 const data = await getBillSummaries(number, type, congress);
                 const arr = extractArrayFromResponse(data);
+                console.log(`[debug] bill ${number}/${type} response:`, data);
+                console.log(`[debug] extracted array for ${number}/${type}:`, arr);
                 const first = Array.isArray(arr) && arr.length ? arr[0] : null;
             if (first) {
-                results.push({ number, type, congress, summary: first });
+                results.push({summary: first });
             } else {
                 console.warn(`[debug] no summary array for ${number} ${type}`);
             }
