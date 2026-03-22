@@ -93,7 +93,7 @@ export default function RepDetailPage() {
 
       {breakdown.length > 0 && (
         <section className="graph-section">
-          <h2>Promises vs. Sponsored Bills</h2>
+          <h2>Promises vs. Recently Sponsored Bills</h2>
           <p className="graph-hint">Colored badges show which promises each bill relates to.</p>
 
           <div className="graph-layout">
@@ -118,7 +118,7 @@ export default function RepDetailPage() {
 
             {/* RIGHT: Bills */}
             <div className="graph-col graph-col--bills">
-              <h3>Sponsored Bills</h3>
+              <h3>Most Recently Sponsored Bills</h3>
               {billTitles.map((bill, idx) => {
                 const indices = billToPromiseIndices[String(bill.number)] || [];
                 return (
