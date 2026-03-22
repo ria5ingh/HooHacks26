@@ -34,12 +34,21 @@ export default function ResultsPage() {
   const breakdown = data?.response?.breakdown ?? [];
   const billTitles = data?.billTitles ?? [];
   const normalizedScore = Math.max(0, Math.min(100, Number(score) || 0));
-  const meterCells = 60;
-  const fulfilledCells = Math.round((normalizedScore / 100) * meterCells);
+  const districtNumber = Number.parseInt(String(data?.district ?? district), 10);
+  const districtPortraitSrc =
+    Number.isInteger(districtNumber) && districtNumber >= 1 && districtNumber <= 11
+      ? `/rep-portraits/va-${String(districtNumber).padStart(2, "0")}.png`
+      : "/rep-portraits/placeholder.svg";
 
   const billByNumber = useMemo(() => {
     const map = new Map();
     billTitles.forEach((bill) => map.set(String(bill.number), bill));
+    return map;
+  }, [billTitles]);
+
+  const billIndexByNumber = useMemo(() => {
+    const map = new Map();
+    billTitles.forEach((bill, idx) => map.set(String(bill.number), idx));
     return map;
   }, [billTitles]);
 
@@ -54,6 +63,21 @@ export default function ResultsPage() {
     });
     return out;
   }, [breakdown]);
+
+  const diagramConnections = useMemo(() => {
+    const out = [];
+    breakdown.forEach((item, promiseIdx) => {
+      item.correlatingBills.forEach((num) => {
+        const billIdx = billIndexByNumber.get(String(num));
+        if (billIdx === undefined) return;
+        out.push({ promiseIdx, billIdx });
+      });
+    });
+    return out;
+  }, [breakdown, billIndexByNumber]);
+
+  const diagramRows = Math.max(breakdown.length, billTitles.length, 1);
+  const diagramHeight = Math.max(220, diagramRows * 54);
 
   useEffect(() => {
     const elements = document.querySelectorAll(".rep-detail .reveal-on-scroll");
@@ -107,7 +131,7 @@ export default function ResultsPage() {
         <button className="back-btn" onClick={() => navigate("/")}>← Back to Search</button>
         <section className="rep-info">
           <h1>No Sample Data Found</h1>
-          <p>District {district} has no entry in sampleAIresponses.json.</p>
+          <p>District {district} has no entry.</p>
         </section>
       </div>
     );
@@ -135,99 +159,185 @@ export default function ResultsPage() {
           </span>
         </div>
 
-        {score !== null && (
-          <div
-            className="kinetic-meter"
-            role="img"
-            aria-label={`Promise fulfillment ${normalizedScore} percent. ${fulfilledCells} of ${meterCells} active cells.`}
-          >
-            <div className="km-head">
-              <p className="km-percent">{normalizedScore}%</p>
-              <p className="km-subtitle">Promise Fulfillment</p>
-            </div>
+        <div className="profile-visual-row">
+          <figure className="rep-portrait-card">
+            <img
+              className="rep-portrait"
+              src={districtPortraitSrc}
+              alt={`${data.representative} district portrait`}
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = "/rep-portraits/placeholder.svg";
+              }}
+            />
+          </figure>
 
-            <div className="km-grid" aria-hidden="true">
-              {Array.from({ length: meterCells }, (_, idx) => {
-                const isActive = idx < fulfilledCells;
-                return (
-                  <span
-                    key={idx}
-                    className={`km-cell ${isActive ? "is-active" : "is-inactive"}`}
-                    style={{ "--cell-delay": `${(idx % 20) * 60}ms` }}
-                  />
-                );
-              })}
-            </div>
-
-            <div className="km-legend">
-              <span className="km-pill km-pill-good">Fulfilled</span>
-              <span className="km-pill km-pill-rest">Remaining</span>
-            </div>
+          <div className="profile-fulfillment">
+            <h2>Promise Fulfillment Analysis</h2>
+            {score !== null && (
+              <div className="fulfillment-chart">
+                <div className="fulfillment-track">
+                  <div
+                    className="fulfillment-bar"
+                    style={{
+                      "--score": `${normalizedScore}%`
+                    }}
+                    role="img"
+                    aria-label={`Promise fulfillment score ${normalizedScore} percent`}
+                  >
+                    <span>{normalizedScore}%</span>
+                  </div>
+                  <div className="fulfillment-metrics">
+                    <span className="fulfillment-score">{normalizedScore}% Fulfilled</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </section>
 
       {breakdown.length > 0 && (
         <section className="graph-section reveal-on-scroll">
-            <h2>Promises vs. Sponsored Bills</h2>
-            <p className="graph-hint">Data source: sampleAIresponses.json.</p>
+          <h2>Promises vs. Sponsored Bills</h2>
 
-            <div className="graph-layout">
-              <div className="graph-col graph-col--promises">
-                <h3>Campaign Promises</h3>
-                {breakdown.map((item, idx) => (
-                  <div key={idx} className="graph-promise-card reveal-on-scroll" style={{ "--stagger": idx }}>
-                    <span
-                      className="promise-badge"
-                      style={{ background: PROMISE_COLORS[idx % PROMISE_COLORS.length] }}
-                    >
-                      {idx + 1}
-                    </span>
-                    <div>
-                      <strong>{item.promiseTopic}</strong>
-                      <p>{item.promiseText}</p>
+          <div className="graph-layout">
+            <div className="graph-col graph-col--promises">
+              <h3>Campaign Promises</h3>
+              {breakdown.map((item, idx) => (
+                <div key={idx} className="graph-promise-card reveal-on-scroll" style={{ "--stagger": idx }}>
+                  <span
+                    className="promise-badge"
+                    style={{ background: PROMISE_COLORS[idx % PROMISE_COLORS.length] }}
+                  >
+                    {idx + 1}
+                  </span>
+                  <div>
+                    <strong>{item.promiseTopic}</strong>
+                    <p>{item.promiseText}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="graph-col graph-col--bills">
+              <h3>Most Recently Sponsored Bills</h3>
+              {billTitles.map((bill, idx) => {
+                const indices = billToPromiseIndices[String(bill.number)] || [];
+                return (
+                  <div key={idx} className="graph-bill-card reveal-on-scroll" style={{ "--stagger": idx }}>
+                    <div className="bill-badges">
+                      {indices.length > 0
+                        ? indices.map((i) => (
+                            <span
+                              key={i}
+                              className="promise-badge"
+                              style={{ background: PROMISE_COLORS[i % PROMISE_COLORS.length] }}
+                              title={breakdown[i]?.promiseTopic}
+                            >
+                              {i + 1}
+                            </span>
+                          ))
+                        : <span className="promise-badge no-match" title="No matching promise">-</span>
+                      }
+                    </div>
+                    <div className="bill-info">
+                      <span className="bill-tag">{bill.type.toUpperCase()} {bill.number}</span>
+                      <span className="bill-title">{bill.title}</span>
                     </div>
                   </div>
-                ))}
-              </div>
+                );
+              })}
+            </div>
+          </div>
 
-              <div className="graph-col graph-col--bills">
-                <h3>Most Recently Sponsored Bills</h3>
-                {billTitles.map((bill, idx) => {
-                  const indices = billToPromiseIndices[String(bill.number)] || [];
+          <div className="promise-map reveal-on-scroll">
+            <h3>Promise-to-Bill Arrow Diagram</h3>
+            <div className="promise-map-wrap">
+              <svg
+                className="promise-map-svg"
+                viewBox={`0 0 1000 ${diagramHeight}`}
+                role="img"
+                aria-label="Arrow diagram mapping campaign promises to recently sponsored bills"
+              >
+                <defs>
+                  <marker
+                    id="promise-arrowhead"
+                    markerWidth="8"
+                    markerHeight="8"
+                    refX="6"
+                    refY="3"
+                    orient="auto"
+                    markerUnits="strokeWidth"
+                  >
+                    <path d="M0,0 L0,6 L6,3 z" fill="#7e4f2f" />
+                  </marker>
+                </defs>
+
+                {diagramConnections.map((link, idx) => {
+                  const y1 = 28 + link.promiseIdx * 54;
+                  const y2 = 28 + link.billIdx * 54;
+                  const color = PROMISE_COLORS[link.promiseIdx % PROMISE_COLORS.length];
                   return (
-                    <div key={idx} className="graph-bill-card reveal-on-scroll" style={{ "--stagger": idx }}>
-                      <div className="bill-badges">
-                        {indices.length > 0
-                          ? indices.map((i) => (
-                              <span
-                                key={i}
-                                className="promise-badge"
-                                style={{ background: PROMISE_COLORS[i % PROMISE_COLORS.length] }}
-                                title={breakdown[i]?.promiseTopic}
-                              >
-                                {i + 1}
-                              </span>
-                            ))
-                          : <span className="promise-badge no-match" title="No matching promise">-</span>
-                        }
-                      </div>
-                      <div className="bill-info">
-                        <span className="bill-tag">{bill.type.toUpperCase()} {bill.number}</span>
-                        <span className="bill-title">{bill.title}</span>
-                      </div>
-                    </div>
+                    <path
+                      key={`${link.promiseIdx}-${link.billIdx}-${idx}`}
+                      d={`M 320 ${y1} C 445 ${y1}, 555 ${y2}, 680 ${y2}`}
+                      fill="none"
+                      stroke={color}
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      markerEnd="url(#promise-arrowhead)"
+                      opacity="0.86"
+                    />
                   );
                 })}
-              </div>
+
+                {breakdown.map((item, idx) => {
+                  const y = 28 + idx * 54;
+                  const promiseLabel =
+                    item.promiseTopic.length > 30
+                      ? `${item.promiseTopic.slice(0, 27)}...`
+                      : item.promiseTopic;
+                  const color = PROMISE_COLORS[idx % PROMISE_COLORS.length];
+
+                  return (
+                    <g key={`promise-node-${idx}`}>
+                      <rect x="20" y={y - 16} width="286" height="32" rx="9" fill="#fff4e1" stroke="#e4c8a6" />
+                      <circle cx="320" cy={y} r="6" fill={color} />
+                      <text x="34" y={y + 4} className="promise-map-label">{idx + 1}. {promiseLabel}</text>
+                    </g>
+                  );
+                })}
+
+                {billTitles.map((bill, idx) => {
+                  const y = 28 + idx * 54;
+                  const rawLabel = `${bill.type.toUpperCase()} ${bill.number}`;
+                  const billLabel = rawLabel.length > 28 ? `${rawLabel.slice(0, 25)}...` : rawLabel;
+
+                  return (
+                    <g key={`bill-node-${idx}`}>
+                      <circle cx="680" cy={y} r="6" fill="#8f5b33" />
+                      <rect x="694" y={y - 16} width="286" height="32" rx="9" fill="#fff4e1" stroke="#e4c8a6" />
+                      <text x="708" y={y + 4} className="promise-map-label">{billLabel}</text>
+                    </g>
+                  );
+                })}
+
+                {diagramConnections.length === 0 && (
+                  <text x="500" y="120" textAnchor="middle" className="promise-map-empty">
+                    No mapped correlations available for this district.
+                  </text>
+                )}
+              </svg>
             </div>
+          </div>
         </section>
       )}
 
       {breakdown.length > 0 && (
         <section className="breakdown-section reveal-on-scroll">
           <h2>Detailed Breakdown</h2>
-          <p className="graph-hint">Per-promise analysis from sample AI output.</p>
+          <p className="graph-hint">Per-promise analysis.</p>
           <div className="breakdown-list">
             {breakdown.map((item, idx) => (
               <div key={idx} className="breakdown-item reveal-on-scroll" style={{ "--stagger": idx }}>

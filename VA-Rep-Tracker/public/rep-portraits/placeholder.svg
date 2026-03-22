@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 420" role="img" aria-labelledby="title desc">
+  <title id="title">Representative placeholder portrait</title>
+  <desc id="desc">Simple placeholder portrait for district representatives</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f6e4ca"/>
+      <stop offset="100%" stop-color="#d9ebe9"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="420" rx="26" fill="url(#bg)"/>
+  <circle cx="160" cy="145" r="70" fill="#f4c89a"/>
+  <path d="M72 340c10-66 46-102 88-102s78 36 88 102" fill="#a86d47"/>
+  <rect x="48" y="286" width="224" height="100" rx="50" fill="#b8825c"/>
+  <text x="160" y="390" text-anchor="middle" font-size="18" font-family="Georgia, serif" fill="#fff8ee">Add District PNG</text>
+</svg>
