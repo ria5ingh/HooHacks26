@@ -32,16 +32,20 @@ export default function SearchPage() {
 
   return (
     <div className="search-page">
-      <h1>Find Your Representative</h1>
+      <img
+        className="sp-logo"
+        src="/hoos-logo/hoos.png"
+        alt="Hoo's Your Rep?"
+      />
 
       <section className="sp-search">
-        <label htmlFor="county-input">Search your county or city:</label>
+        <label htmlFor="county-input">Find out what your rep did for you!</label>
         <input
           id="county-input"
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="e.g. Fairfax, Arlington…"
+          placeholder="Enter your County/City…"
         />
       </section>
 

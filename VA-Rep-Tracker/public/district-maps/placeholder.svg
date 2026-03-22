@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" rx="12" fill="#fff4e1"/>
+  <rect x="1" y="1" width="398" height="298" rx="11" stroke="#d6c5b0" stroke-width="2" fill="none"/>
+  <text x="200" y="140" text-anchor="middle" font-family="system-ui, sans-serif" font-size="18" font-weight="600" fill="#9c6a3f">District Map</text>
+  <text x="200" y="170" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" fill="#b18d6f">Coming Soon</text>
+</svg>

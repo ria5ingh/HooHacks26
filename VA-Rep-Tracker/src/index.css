@@ -140,6 +140,7 @@ code {
   filter: blur(2px);
   animation: ww-blobA 18s linear infinite;
   pointer-events: none;
+  z-index: 0;
 }
 
 .search-page::after,
@@ -153,6 +154,7 @@ code {
   filter: blur(2px);
   animation: ww-blobB 20s linear infinite;
   pointer-events: none;
+  z-index: 0;
 }
 
 .search-page h1,
@@ -169,6 +171,15 @@ code {
 /* Search Page */
 .search-page {
   text-align: center;
+  justify-content: center;
+}
+
+.sp-logo {
+  max-width: 560px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 40px;
+  animation: ww-pop 550ms cubic-bezier(0.19,1,0.22,1);
 }
 
 .sp-search {
@@ -309,6 +320,8 @@ code {
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
   width: fit-content;
+  position: relative;
+  z-index: 1;
 }
 
 .rep-detail .back-btn {
@@ -336,6 +349,8 @@ code {
   background: rgba(255,248,238,0.85);
   backdrop-filter: blur(4px);
   animation: ww-rise 400ms ease-out both;
+  position: relative;
+  z-index: 1;
 }
 
 .rep-info   { animation-delay: 60ms; }
@@ -446,8 +461,6 @@ code {
   align-items: center;
   text-align: center;
   justify-content: center;
-  width: 100%;
-  min-height: 220px;
   padding: 12px;
   border: 1px solid #d6c5b0;
   border-radius: 14px;
@@ -457,6 +470,7 @@ code {
 
 .profile-fulfillment h2 {
   margin-bottom: 10px;
+  color: #763f16;
 }
 
 .fulfillment-chart {
@@ -475,11 +489,10 @@ code {
 .profile-visual-row {
   margin-top: 22px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 320px));
+  grid-template-columns: 1fr 1fr 2fr;
   gap: 20px;
   align-items: stretch;
   width: 100%;
-  justify-content: center;
 }
 
 .rep-portrait-card {
@@ -488,7 +501,6 @@ code {
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.6);
   padding: 12px;
-  min-height: 220px;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -497,9 +509,35 @@ code {
 .rep-portrait {
   width: 100%;
   height: 100%;
-  min-height: 190px;
   object-fit: cover;
   border-radius: 10px;
+}
+
+.district-map-card {
+  margin: 0;
+  border: 1px solid #d6c5b0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.district-map {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.district-map-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #763f16;
+  letter-spacing: 0.02em;
 }
 
 .fulfillment-bar {
@@ -536,20 +574,22 @@ code {
 @media (max-width: 760px) {
   .profile-visual-row {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 16px;
   }
 
   .rep-portrait-card {
-    max-width: 280px;
-    width: 100%;
+    max-width: 320px;
     justify-self: center;
   }
 
   .profile-fulfillment {
-    max-width: 280px;
+    max-width: 320px;
     justify-self: center;
-    align-items: center;
-    text-align: center;
+  }
+
+  .district-map-card {
+    max-width: 320px;
+    justify-self: center;
   }
 
   .fulfillment-chart {
@@ -591,14 +631,34 @@ code {
 
 .graph-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 0 16px;
   align-items: start;
 }
 
-@media (max-width: 640px) {
+.graph-col--bills {
+  grid-column: 3;
+}
+
+@media (max-width: 760px) {
+  .graph-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .graph-col--bills {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 480px) {
   .graph-layout {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .graph-col--bills {
+    grid-column: 1;
   }
 }
 
@@ -613,43 +673,17 @@ code {
   letter-spacing: 0.05em;
 }
 
-.promise-map {
-  margin-top: 18px;
+.graph-map-container {
+  position: relative;
 }
 
-.promise-map h3 {
-  margin: 0 0 10px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #763f16;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.promise-map-wrap {
-  width: 100%;
-  overflow-x: auto;
-  border: 1px solid #e4c8a6;
-  border-radius: 10px;
-  background: #fffaf0;
-}
-
-.promise-map-svg {
-  width: 100%;
-  min-width: 920px;
-  display: block;
-}
-
-.promise-map-label {
-  font-size: 12px;
-  fill: #4c2c17;
-  font-weight: 600;
-}
-
-.promise-map-empty {
-  font-size: 14px;
-  fill: #8f5b33;
-  font-style: italic;
+.graph-map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 2;
+  overflow: visible;
 }
 
 .graph-promise-card,
@@ -662,7 +696,22 @@ code {
   background: #fff4e1;
   border: 1px solid #e4c8a6;
   border-radius: 7px;
-  transition: background 0.2s;
+  transition: background 0.24s ease, border-color 0.24s ease;
+}
+
+.graph-bill-card {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.graph-bill-card.expanded {
+  border-color: #d0a878;
+}
+
+.graph-bill-card.is-hover-match {
+  background: var(--hover-tint);
+  border-color: var(--hover-border);
 }
 
 .graph-promise-card:hover,
@@ -679,7 +728,8 @@ code {
 
 .bill-badges {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
   gap: 4px;
   flex-shrink: 0;
 }
@@ -688,6 +738,8 @@ code {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: 1;
+  min-width: 0;
 }
 
 .bill-tag {
@@ -707,6 +759,52 @@ code {
   font-size: 13px;
   color: #4c2c17;
   line-height: 1.4;
+}
+
+.bill-title--truncated {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.bill-title-dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% - 1px);
+  z-index: 20;
+  background: #fff4e1;
+  border: 1px solid #d0a878;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: 8px 12px 10px;
+  font-size: 13px;
+  color: #4c2c17;
+  line-height: 1.5;
+  box-shadow: 0 6px 16px rgba(91, 53, 19, 0.14);
+  animation: billDropOpen 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes billDropOpen {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.bill-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+
+.bill-expand-caret {
+  font-size: 10px;
+  color: #8f5b33;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 /* Shared promise badge circle */

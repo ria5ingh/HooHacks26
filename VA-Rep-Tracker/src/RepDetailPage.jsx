@@ -80,7 +80,7 @@ export default function RepDetailPage() {
 
       <section className="analysis">
         <h2>Promise Fulfillment Analysis</h2>
-        {loading && <p className="loading-text">Analyzing sponsored bills with AI…</p>}
+        {loading && <p className="loading-text">Analyzing sponsored bills</p>}
         {error && <p className="error">{error}</p>}
 
         {fulfillmentScore !== null && (
@@ -153,7 +153,7 @@ export default function RepDetailPage() {
       {breakdown.length > 0 && (
         <section className="breakdown-section">
           <h2>Detailed Breakdown</h2>
-          <p className="graph-hint">Per-promise analysis from AI — scroll to see all.</p>
+          <p className="graph-hint">Per-promise analysis.</p>
           <div className="breakdown-list">
             {breakdown.map((item, idx) => (
               <div key={idx} className="breakdown-item">
