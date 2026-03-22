@@ -49,3 +49,57 @@ export async function getCosponLegislation(ID){
     console.log('[debug] getCosponLegislation sample=', valid.slice(0, 3));
     return valid.slice(0, 10);
 }
+
+/**
+ * HELPER FUNCTION: Create a dictionary mapping bill number -> bill type from
+ * the array returned by `getSponsoredLegislation` (or similar).
+ * Returns an empty object for invalid input.
+ */
+export function extractNumberTypeMap(items) {
+    if (!Array.isArray(items)) return {};
+    return items.reduce((map, bill) => {
+            map[bill.number] = [String(bill.type || "").toLowerCase(), bill.congress];
+        return map;
+    }, {});
+}
+
+/**
+ * Given a map of billNumber -> billType, fetch one summary per bill
+ * from `/bill/{congress}/{billnumber}/{billtype}/summaries` and
+ * return an array of result objects: { number, type, congress, summary }
+ *
+ * Runs sequentially to be conservative with rate limits; continues on error.
+ */
+export async function fetchSummariesFromMap(map) {;
+    const results = [];
+    const entries = Object.entries(map);
+    for (const [number, [type, congress]] of entries) {
+            try {
+                const data = await getBillSummaries(number, type, congress);
+                const arr = extractArrayFromResponse(data);
+                const first = Array.isArray(arr) && arr.length ? arr[0] : null;
+            if (first) {
+                results.push({ number, type, congress, summary: first });
+            } else {
+                console.warn(`[debug] no summary array for ${number} ${type}`);
+            }
+        } catch (err) {
+            console.error(`[debug] fetchSummariesFromMap error for ${number} ${type}:`, err.message || err);
+        }
+    }
+    return results;
+}
+
+    export async function getBillSummaries(billNumber, billType, congress){
+        const { data } = await congressClient.get("/bill/" + congress + "/" + billType + "/" + billNumber + "/summaries", {
+            params: { limit : 1}
+        });
+        return data;
+    }
+
+    export async function getBillSummaryTest(){
+        const { data } = await congressClient.get("/bill/118/hr/54/summaries", {
+            params: { limit : 1}
+        });
+        return data;
+    }
