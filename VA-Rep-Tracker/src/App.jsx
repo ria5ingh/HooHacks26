@@ -60,10 +60,10 @@ function HomePage() {
 
         {results.length > 0 && (
           <ul>
-            {results.map((item) => (
+            {results.map((item, index) => (
               <li
                 key={item.name}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", "--stagger": index }}
                 onClick={() => onSelectItem(item.name)}
               >
                 {item.name}: District {item.district}
