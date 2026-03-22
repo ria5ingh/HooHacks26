@@ -1,12 +1,13 @@
-import { Routes, Route } from "react-router-dom";
+// App.jsx
+import { Route, Routes } from "react-router-dom";
 import SearchPage from "./SearchPage";
-import RepDetailPage from "./RepDetailPage";
+import ResultsPage from "./ResultsPage";
 
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<SearchPage />} />
-      <Route path="/rep" element={<RepDetailPage />} />
+      <Route path="/results" element={<ResultsPage />} />
     </Routes>
   );
 }
