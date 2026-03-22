@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { getCosponLegislation } from "./api/votes";
 import { getSponLegislation } from "./api/votes";
+import { extractNumberTypeMap } from "./api/votes";
+import { fetchSummariesFromMap } from "./api/votes";
 import { useMemo, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { generateContent } from "./api/geminiClient";
@@ -82,6 +84,7 @@ function HomePage() {
   );
 }
 
+/** 
 export default function App() {
   useEffect(() => {
     getSponLegislation("L000174")
@@ -99,4 +102,19 @@ export default function App() {
       <Route path="/results" element={<ResultsPage />} />
     </Routes>
   );
+}
+**/
+
+export default function App() {
+  useEffect(() => {
+    getSponLegislation("L000174")
+      .then((arr) => {
+        const map = extractNumberTypeMap(arr);
+        return fetchSummariesFromMap(map, "119");
+      })
+      .then((summaries) => console.log(summaries))
+      .catch((err) => console.error(err));
+  }, []);
+
+  return <div>VA Rep Dashboard</div>;
 }
