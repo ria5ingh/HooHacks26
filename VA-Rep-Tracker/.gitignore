@@ -13,7 +13,8 @@ dist-ssr
 *.local
 
 # Editor directories and files
-.vscode/*
+.vscode/**
+**/.agents/**
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -23,3 +24,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+*.env
+!.env.example
+.vscode/mcp.json
